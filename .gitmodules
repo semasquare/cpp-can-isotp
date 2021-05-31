@@ -1,9 +1,9 @@
 [submodule "deps/etl"]
 	path = deps/etl
-	url = git@github.com:ETLCPP/etl.git
+	url = https://github.com/ETLCPP/etl.git
 [submodule "deps/GSL"]
 	path = deps/GSL
-	url = git@github.com:microsoft/GSL.git
+	url = https://github.com/microsoft/GSL.git
 [submodule "deps/fmt"]
 	path = deps/fmt
-	url = git@github.com:fmtlib/fmt.git
+	url = https://github.com/fmtlib/fmt.git
