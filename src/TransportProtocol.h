@@ -205,7 +205,7 @@ private:
         static uint32_t now ()
         {
                 static TimeProvider tp;
-                return tp ();
+                return static_cast<uint32_t>(tp());
         }
 
         /*
@@ -745,7 +745,7 @@ int TransportProtocol<TraitsT>::TransportMessage::append (CanFrameWrapperType co
                 data.insert (data.end (), frame.get (inputIndex + offset));
         }
 
-        return len;
+        return static_cast<int>(len);
 }
 
 /*****************************************************************************/

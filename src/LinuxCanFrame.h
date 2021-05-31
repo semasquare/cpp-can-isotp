@@ -59,8 +59,8 @@ public:
         uint8_t getDlc () const { return frame.can_dlc; }
         void setDlc (uint8_t d) { frame.can_dlc = d; }
 
-        uint8_t get (size_t i) const { return gsl::at (frame.data, i); }
-        void set (size_t i, uint8_t b) { gsl::at (frame.data, i) = b; }
+        uint8_t get (size_t i) const { return gsl::at (frame.data, static_cast<gsl::index>(i)); }
+        void set (size_t i, uint8_t b) { gsl::at (frame.data, static_cast<gsl::index>(i)) = b; }
 
 private:
         can_frame frame{};

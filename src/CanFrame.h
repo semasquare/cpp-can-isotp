@@ -62,8 +62,8 @@ public:
         uint8_t getDlc () const { return frame.dlc; }
         void setDlc (uint8_t d) { frame.dlc = d; }
 
-        uint8_t get (size_t i) const { return gsl::at (frame.data, i); }
-        void set (size_t i, uint8_t b) { gsl::at (frame.data, i) = b; }
+        uint8_t get (size_t i) const { return gsl::at (frame.data, static_cast<gsl::index>(i)); }
+        void set (size_t i, uint8_t b) { gsl::at (frame.data, static_cast<gsl::index>(i)) = b; }
 
 private:
         // TODO this should be some kind of handler if we wantto call this class a "wrapper".
