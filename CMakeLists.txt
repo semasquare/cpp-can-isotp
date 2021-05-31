@@ -11,7 +11,7 @@ endif(COMMAND cmake_policy)
 PROJECT (cpp-can-isotp)
 
 ADD_LIBRARY (cpp-can-isotp INTERFACE)
-TARGET_INCLUDE_DIRECTORIES (cpp-can-isotp INTERFACE src/)
+TARGET_INCLUDE_DIRECTORIES (cpp-can-isotp INTERFACE "src" "deps/GSL/include" "deps/etl/include" "deps/fmt/include")
 
 SET (CMAKE_CXX_FLAGS "-std=c++17 -Wall -fsanitize=address -fno-omit-frame-pointer" CACHE INTERNAL "cxx compiler flags")
 INCLUDE_DIRECTORIES("src" "deps/GSL/include" "deps/etl/include" "deps/fmt/include")
