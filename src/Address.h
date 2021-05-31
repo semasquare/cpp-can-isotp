@@ -440,7 +440,7 @@ template <typename T> struct AddressTraitsBase {
         template <typename CFWrapper> static uint8_t getDataLengthS (CFWrapper const &f) { return getNPciByte (f) & 0x0f; }
         template <typename CFWrapper> static uint16_t getDataLengthF (CFWrapper const &f)
         {
-                return ((getNPciByte (f) & 0x0f) << 8) | f.get (N_PCI_OFSET + 1);
+                return static_cast<uint16_t>(((getNPciByte (f) & 0x0f) << 8) | f.get (N_PCI_OFSET + 1));
         }
         template <typename CFWrapper> static uint8_t getSerialNumber (CFWrapper const &f) { return getNPciByte (f) & 0x0f; }
         template <typename CFWrapper> static FlowStatus getFlowStatus (CFWrapper const &f) { return FlowStatus (getNPciByte (f) & 0x0f); }

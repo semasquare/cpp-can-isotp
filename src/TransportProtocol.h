@@ -384,6 +384,8 @@ private:
 
         void confirm (Address const &a, Result r)
         {
+                (void)a;
+                (void)r;
                 if constexpr (HasCallbackConfirmMethod<Callback>::value) {
                         callback.confirm (a, r);
                 }
@@ -391,6 +393,8 @@ private:
 
         void firstFrameIndication (Address const &a, uint16_t len)
         {
+                (void)a;
+                (void)len;
                 if constexpr (HasCallbackFFIMethod<Callback>::value) {
                         callback.firstFrameIndication (a, len);
                 }
@@ -398,6 +402,9 @@ private:
 
         void indication (Address const &a, IsoMessageT const &msg, Result r)
         {
+                (void)a;
+                (void)msg;
+                (void)r;
                 constexpr bool simpleCallback = IsCallbackSimple<Callback>::value;
                 constexpr bool advancedCallback = IsCallbackAdvanced<Callback>::value;
                 constexpr bool advancedMethodCallback = IsCallbackAdvancedMethod<Callback>::value;
@@ -547,7 +554,7 @@ template <typename TraitsT> bool TransportProtocol<TraitsT>::onCanNewFrame (cons
         switch (AddressTraitsT::getType (frame)) {
         case IsoNPduType::SINGLE_FRAME: {
                 TransportMessage message;
-                int singleFrameLen = AddressTraitsT::getDataLengthS (frame);
+                size_t singleFrameLen = AddressTraitsT::getDataLengthS (frame);
 
                 // Error situation. Such frames should be ignored according to 6.5.2.2 page 24.
                 if (singleFrameLen <= 0 || (AddressTraitsT::USING_EXTENDED && singleFrameLen > 6) || singleFrameLen > 7) {
@@ -609,7 +616,7 @@ template <typename TraitsT> bool TransportProtocol<TraitsT>::onCanNewFrame (cons
                 isoMessage.timer.start (N_BS_TIMEOUT);
                 isoMessage.timeoutReason = Result::N_TIMEOUT_BS;
                 uint8_t dataOffset = AddressTraitsT::N_PCI_OFSET + 2;
-                isoMessage.append (frame, dataOffset, firstFrameLen);
+                isoMessage.append (frame, dataOffset, static_cast<size_t>(firstFrameLen));
 
                 // Send Flow Control
                 if (!sendFlowFrame (outgoingAddress, FlowStatus::CONTINUE_TO_SEND)) {
@@ -649,7 +656,7 @@ template <typename TraitsT> bool TransportProtocol<TraitsT>::onCanNewFrame (cons
 #endif
 
                 uint8_t dataOffset = AddressTraitsT::N_PCI_OFSET + 1;
-                transportMessage.append (frame, dataOffset, consecutiveFrameLen);
+                transportMessage.append (frame, dataOffset, static_cast<size_t>(consecutiveFrameLen));
 
                 // Send flow control frame.
                 if (blockSize > 0 && ++transportMessage.consecutiveFramesReceived >= blockSize) {
@@ -768,7 +775,7 @@ template <typename TraitsT> Status TransportProtocol<TraitsT>::StateMachine::run
         }
 
         IsoMessageT *message = &this->message;
-        uint16_t isoMessageSize = message->size ();
+        uint16_t isoMessageSize = static_cast<uint16_t>(message->size ());
         using Traits = AddressTraits<AddressEncoderT>;
 
         switch (state) {
@@ -785,13 +792,13 @@ template <typename TraitsT> Status TransportProtocol<TraitsT>::StateMachine::run
                         return Status::ADDRESS_ENCODE_ERROR;
                 }
 
-                int toSend = std::min<int> (isoMessageSize, 6);
+                size_t toSend = std::min<size_t> (isoMessageSize, 6);
 
                 for (int i = 0; i < toSend; ++i) {
-                        canFrame.set (i + 2, message->at (i));
+                        canFrame.set (i + 2, message->at (static_cast<std::vector<unsigned char>::size_type>(i)));
                 }
 
-                canFrame.setDlc (2 + toSend);
+                canFrame.setDlc (static_cast<uint8_t>(2 + (toSend & 0x000000ff)));
 
                 if (!outputInterface (canFrame.value ())) {
                         tp.confirm (myAddress, Result::N_TIMEOUT_A); // TODO is it correct Result::?
@@ -888,12 +895,12 @@ template <typename TraitsT> Status TransportProtocol<TraitsT>::StateMachine::run
                 ++sequenceNumber;
                 sequenceNumber %= 16;
 
-                int toSend = std::min<int> (isoMessageSize - bytesSent, 7);
-                for (int i = 0; i < toSend; ++i) {
+                size_t toSend = std::min<size_t> (isoMessageSize - bytesSent, 7);
+                for (size_t i = 0; i < toSend; ++i) {
                         canFrame.set (i + 1, message->at (i + bytesSent));
                 }
 
-                canFrame.setDlc (1 + toSend);
+                canFrame.setDlc (static_cast<uint8_t>(1 + (toSend & 0x000000ff)));
 
                 if (!outputInterface (canFrame.value ())) {
                         tp.confirm (myAddress, Result::N_TIMEOUT_A);

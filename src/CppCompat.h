@@ -65,5 +65,6 @@ template <typename _Tp> auto declval () noexcept -> decltype (__declval<_Tp> (0)
 #include <gsl/gsl>
 #endif
 
+#include <etl/array.h>
 #include <etl/map.h>
 #include <etl/optional.h>
